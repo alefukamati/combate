@@ -1,24 +1,14 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-#define potPinD 35  // está marcado como D35 no DevKit
-#define potPinV 34      // está marcado como D34 no DevKit
-#define potTriggerR 32     // está marcado como D32 no DevKit
-#define potTriggerL 39     //está marcado como D39 no DevKit
-
+#define potPinD 35  // está marcado como D32 no DevKit
+#define potPinV 34      // está marcado como VN no DevKit
 
 #define LED 2   //LED para verificação de status da comunicação
-#define CAL 27  //Pino usado para calibrar os joysticks
-#define B1 14
-#define B2 15
-#define B3 24
-#define B4 25
+#define CAL 15  //Pino usado para calibrar os joysticks
 
 int valorDir = 0;
 int valorSpd = 0;
-
-int valorTriggerL = 0;
-int valorTriggerR = 0;
 
 int statusCom = 0; //status da comunicação
 int contValidacao = 0; //contador para validar a comunicação
@@ -62,7 +52,6 @@ typedef struct struct_message {
   int spdLeft;
   String dir;
   int cont;
-  int angle;
 } struct_message;
 
 
@@ -258,15 +247,9 @@ void setup() {
   
   pinMode(CAL, INPUT_PULLDOWN);
   pinMode(LED, OUTPUT);
-  pinMode(B1, INPUT);
-  pinMode(B2, INPUT);
-  pinMode(B3, INPUT);
-  pinMode(B4, INPUT);
-
+  
   pinMode(potPinD, INPUT);
   pinMode(potPinV, INPUT);
-  pinMode(potTriggerL, INPUT);
-  pinMode(potTriggerR, INPUT);
  
   // Configura o ESP32 como um Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -315,6 +298,7 @@ void loop() {
   if(cal == 1){
         calibracao();
   }else{
+    
         valorDir = analogRead(potPinD);
         valorSpd = analogRead(potPinV);
 
@@ -364,25 +348,6 @@ void loop() {
 
         mySpd.cont = contValidacao; 
 
-        valorTriggerR = analogRead(potTriggerR);
-        valorTriggerL = analogRead(potTriggerL);
-
-        //Função de arma - acelaração contínua (R2)
-        if (potTriggerL > 10){ 
-          angle = map(valorTriggerL, 0, 255, 40, 140);
-        }
-        //Função de arma - aceleração discreta (R1)
-        if (digitalRead(B1) == 1){
-          angle = angle+2;
-        }
-
-        //Quadrado
-        if (digitalRead(B2) == 1){
-          angle = 40;
-        }
-        
-        mySpd.angle = angle;
-        
         // Envia os dados via ESP-NOW
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &mySpd, sizeof(mySpd));
 
