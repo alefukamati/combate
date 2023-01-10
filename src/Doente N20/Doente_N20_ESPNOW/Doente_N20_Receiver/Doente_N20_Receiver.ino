@@ -1,6 +1,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
-
+#include <ESP32Servo.h> 
 //Locomocão 
 #define PWMA 27
 #define PWMB 26
