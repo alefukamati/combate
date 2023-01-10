@@ -1,3 +1,5 @@
+// Código para a obtenção do MAC ADDRESS da ESP32 que receberá 
+// o sinal do controle
 #include <WiFi.h>
 
 void setup(){
