@@ -1,6 +1,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <ESP32Servo.h> 
+
 //Locomocão 
 #define PWMA 27
 #define PWMB 26
@@ -21,6 +22,11 @@ PINO 17 - RODA DIREITA
 int SpdRight = 0;
 int SpdLeft = 0;
 
+//Brushless da arma
+static const int brushPin = 4; 
+Servo_ESP32 servo;
+
+
 int lastVal = 0;
 
 //Estrutura damensagem que será enviada
@@ -30,6 +36,7 @@ typedef struct struct_message {
   int leftSpd;  //recebe o valor da velocidade da esquerda
   String Dir; //recebe o valor da direção
   int val;
+  int angle;
 } struct_message;
 
 
@@ -74,7 +81,11 @@ void setup() {
   digitalWrite(A2, 0);
   digitalWrite(B1, 0);
   digitalWrite(B2, 0);
- 
+
+
+  servo.attach(brushPin);
+  int angle = 0;
+  servo.write(angle);
   // Configura o ESP32 como um Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -94,6 +105,11 @@ void loop() {
     SpdRight = map(0, -100, 100, -180, 180);
     SpdLeft = map(0, -100, 100, -180, 180);
     digitalWrite(LED, LOW);
+    servo.write(0);
+    digitalWrite(A1,0);
+    digitalWrite(A2,0);
+    digitalWrite(B1,0);
+    digitalWrite(B2,0);
   }else{
     SpdRight = map(myData.rightSpd, -100, 100, -180, 180);   // Realiza a conversão para valores entre 0 e 180 para o motor da direita
     SpdLeft = map(myData.leftSpd, -100, 100, -180, 180); // Realiza a conversão para valores entre 0 e 180 para o motor da esquerda
@@ -121,8 +137,10 @@ void loop() {
     digitalWrite(B2,1);
   }
   ledcWrite(6, abs(myData.rightSpd));
+  servo.write(myData.angle); //COMENTAR ESTE COMANDO EM CASO DE TESTE!!!!! (ATIVA A ARMA)
 
-
+  Serial.print("Angle: ");
+  Serial.println(myData.angle);
   Serial.print("SpdRight: ");
   Serial.print(SpdRight);
   Serial.print("\t");
