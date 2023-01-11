@@ -182,7 +182,7 @@
     servo.write(angle);
     motors_control(0,0);
     Serial.println("Restart");
-    setup();
+    ESP.restart();
     delay(20);
     }
     
