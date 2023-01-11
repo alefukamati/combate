@@ -11,6 +11,13 @@
 #define switch3 26
 #define switch4 28
 
+//---------------- PINOS DOS BOTÕES ---------------//
+#define B1 14
+#define B2 15
+#define B3 24
+#define B4 25
+
+
 #define LED 2   //LED para verificação de status da comunicação
 #define CAL 15  //Pino usado para calibrar os joysticks
 
@@ -23,7 +30,7 @@ int lastValidacao = 0; //estado da ultima validação
 int atualValidacao = 0; //estado atual da validação
 int broadcastIndex = 1; //índice para o Mac Address no array de Mac Addresses
 int lastBroadcastIndex = 1;
-
+int inv = 1; //indica se o sentido de locomoção está invertido
 //---------- VARIÁVEIS DE CALIBRAÇÃO ---------------- //
 int cal = 0;
 int temp = 0;
@@ -261,6 +268,11 @@ void setup() {
   pinMode(potPinD, INPUT);
   pinMode(potPinV, INPUT);
 
+  pinMode(B1, INPUT);
+  pinMode(B2, INPUT);
+  pinMode(B3, INPUT);
+  pinMode(B4, INPUT);
+
   pinMode(switch1, INPUT_PULLUP);
   pinMode(switch2, INPUT_PULLUP);
   pinMode(switch3, INPUT_PULLUP);
@@ -338,7 +350,13 @@ void loop() {
   if(cal == 1){
         calibracao();
   }else{
-    
+        if(digitalRead(B1) == 1){ //Sentido de rotação normal quando B1 é acionado
+          inv = 1;
+        }
+
+        if(digitalRead(B2) == 1){ //Inverte o sentido de rotação quando B2 é acionado
+          inv = -1;
+        }
         valorDir = analogRead(potPinD);
         valorSpd = analogRead(potPinV);
 
@@ -357,8 +375,7 @@ void loop() {
         }else {
             valorSpd = map(valorSpd, maiorMidRY, maiorRY, 0, 100); 
         }
-
-
+        valorSpd = inv*valorSpd;
         if (valorDir > 0){
             mySpd.spdLeft = valorSpd;
             mySpd.spdRight = valorSpd - valorSpd*(valorDir/100);
@@ -387,6 +404,7 @@ void loop() {
         Serial.println("\t");
 
         mySpd.cont = contValidacao; 
+
 
         // Envia os dados via ESP-NOW
         

@@ -3,12 +3,16 @@
 
 #define potPinD 35  // está marcado como D35 no DevKit
 #define potPinV 34      // está marcado como D34 no DevKit
+
+//---------------- PINOS DOS GATILHOS ---------------//
 #define potTriggerR 32     // está marcado como D32 no DevKit
 #define potTriggerL 39     //está marcado como D39 no DevKit
 
 
 #define LED 2   //LED para verificação de status da comunicação
 #define CAL 27  //Pino usado para calibrar os joysticks
+
+//---------------- PINOS DOS BOTÕES---------------//
 #define B1 14
 #define B2 15
 #define B3 24
