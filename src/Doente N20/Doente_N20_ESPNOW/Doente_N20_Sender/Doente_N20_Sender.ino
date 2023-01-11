@@ -1,8 +1,15 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+// --------------------- PINOS DOS ANALÓGICOS --------------//
 #define potPinD 35  // está marcado como D32 no DevKit
 #define potPinV 34      // está marcado como VN no DevKit
+
+//---------------- PINOS DO DIP SWITCH ---------------//
+#define switch1 9 
+#define switch2 3
+#define switch3 26
+#define switch4 28
 
 #define LED 2   //LED para verificação de status da comunicação
 #define CAL 15  //Pino usado para calibrar os joysticks
@@ -14,6 +21,8 @@ int statusCom = 0; //status da comunicação
 int contValidacao = 0; //contador para validar a comunicação
 int lastValidacao = 0; //estado da ultima validação
 int atualValidacao = 0; //estado atual da validação
+int broadcastIndex = 1; //índice para o Mac Address no array de Mac Addresses
+int lastBroadcastIndex = 1;
 
 //---------- VARIÁVEIS DE CALIBRAÇÃO ---------------- //
 int cal = 0;
@@ -43,7 +52,8 @@ PINO 32 -- DIREITA OU ESQUERDA (potenciômetro)
 PINO 39 -- FRENTE OU TRÁS (potenciômetro)
 */
 
-uint8_t broadcastAddress[] = {0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}; //COLOQUE os valores do endereço MAC do receptor
+uint8_t addressArrays[4][6] = {} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES
+uint8_t broadcastAddress[6] = {}; //COLOQUE os valores do endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}
 
 //Estrutura da mensagem que será enviada
 //DEVE SER A MESMA ESTRUTURA NO RECEPTOR
@@ -250,7 +260,14 @@ void setup() {
   
   pinMode(potPinD, INPUT);
   pinMode(potPinV, INPUT);
- 
+
+  pinMode(switch1, INPUT_PULLUP);
+  pinMode(switch2, INPUT_PULLUP);
+  pinMode(switch3, INPUT_PULLUP);
+  pinMode(switch4, INPUT_PULLUP); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP 
+  //Se não forem PULLUP, a função getIndex deverá ser alterada retirando os !
+
+  lastBroadcastIndex = getIndex();
   // Configura o ESP32 como um Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -260,24 +277,47 @@ void setup() {
     return;
   }
 
-  
   //Configura a função de callback que será chamada ao enviar algum dado
   esp_now_register_send_cb(OnDataSent);
   
+  register_peer(lastBroadcastIndex);
+}
+
+int getIndex(){
+  broadcastIndex = (1*(!digitalRead(switch1))
+  + 2*(!digitalRead(switch2))
+  + 3*(!digitalRead(switch3))
+  + 4*(!digitalRead(switch4))); //define o índice da array de mac adrresses com base no dip switch
+  if(broadcastIndex == 0){
+    broadcastIndex = 1;
+  }
+  else{
+    broadcastIndex = broadcastIndex - 1;
+  }
+  return broadcastIndex;
+}
+
+void register_peer(int broadcastIndex){
+  memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); // Indica o MacAddress com base no dip switch
+  esp_now_peer_info_t peerInfo;
   // Registra o dispositivo que receberá os dados (peer)
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
-  
-  // Adiciona o dispositivo que receberá os dados (peer)  
+  peerInfo.channel = 0;  //define o canal utilizado
+  peerInfo.encrypt = false; //define se a mensagem será criptografada
+  // Adiciona o dispositivo que receberá os dados (peer) 
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
     return;
   }
-
 }
- 
+
 void loop() {
+  broadcastIndex = getIndex(); //define o índice
+  if (broadcastIndex != lastBroadcastIndex){ //se o índice for diferente do anterior, registra o novo dispositivo
+    register_peer(broadcastIndex);
+  }
+  memcpy(broadcastAddress, addressArrays[broadcastIndex], 6);
+  lastBroadcastIndex = broadcastIndex;
   
   if (digitalRead(CAL) == 1 && temp == 0 && cal == 0){ //inicializa a contagem de tempo para começar a calbração
       temp = millis(); 
@@ -349,6 +389,7 @@ void loop() {
         mySpd.cont = contValidacao; 
 
         // Envia os dados via ESP-NOW
+        
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &mySpd, sizeof(mySpd));
 
         if (result == ESP_OK && statusCom == 1) {
