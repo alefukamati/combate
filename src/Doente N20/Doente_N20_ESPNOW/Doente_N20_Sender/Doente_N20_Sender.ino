@@ -264,7 +264,8 @@ void setup() {
   pinMode(switch1, INPUT_PULLUP);
   pinMode(switch2, INPUT_PULLUP);
   pinMode(switch3, INPUT_PULLUP);
-  pinMode(switch4, INPUT_PULLUP); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP
+  pinMode(switch4, INPUT_PULLUP); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP 
+  //Se não forem PULLUP, a função getIndex deverá ser alterada retirando os !
 
   lastBroadcastIndex = getIndex();
   // Configura o ESP32 como um Wi-Fi Station
@@ -311,7 +312,7 @@ void register_peer(int broadcastIndex){
 }
 
 void loop() {
-  broadcastIndex = getIndex;
+  broadcastIndex = getIndex();
   if (broadcastIndex != lastBroadcastIndex){
     register_peer(broadcastIndex);
   }
