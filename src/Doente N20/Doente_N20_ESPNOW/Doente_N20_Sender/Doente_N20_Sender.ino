@@ -53,7 +53,7 @@ PINO 39 -- FRENTE OU TRÁS (potenciômetro)
 */
 
 uint8_t addressArrays[4][6] = {} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES
-uint8_t broadcastAddress[6] = {0, 0, 0, 0, 0, 0}; //COLOQUE os valores do endereço MAC do receptor
+uint8_t broadcastAddress[6] = {}; //COLOQUE os valores do endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}
 
 //Estrutura da mensagem que será enviada
 //DEVE SER A MESMA ESTRUTURA NO RECEPTOR
@@ -312,8 +312,8 @@ void register_peer(int broadcastIndex){
 }
 
 void loop() {
-  broadcastIndex = getIndex();
-  if (broadcastIndex != lastBroadcastIndex){
+  broadcastIndex = getIndex(); //define o índice
+  if (broadcastIndex != lastBroadcastIndex){ //se o índice for diferente do anterior, registra o novo dispositivo
     register_peer(broadcastIndex);
   }
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6);
