@@ -121,7 +121,7 @@
     if(PS4.isConnected()!= true){
     motors_control(0,0);
     Serial.println("Restart");
-    setup();
+    ESP.restart();
     delay(20);
     }
     
