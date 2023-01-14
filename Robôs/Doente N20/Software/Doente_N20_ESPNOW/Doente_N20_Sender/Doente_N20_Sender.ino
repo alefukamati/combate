@@ -1,9 +1,24 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+/*Falta criar condições para fazer cada botão funcionar de maneira diferente com base no robô selecionado
+ * de forma que o código seja um só para controlar todos os robôs. De forma geral, só falta juntar o código 
+ * dos robôs. Pode ser que exista alguma dificuldade em fazer com que a array enviada seja igual para todos os
+ * robôs, mas nada muito além disso.
+ * 
+ * -------------PARA O TESTE---------------
+ * Para o teste no Doente clássico, basta inserir o MAC ADDRESS do robô (que pode ser obtido pelo código de
+ * obtenção de MAC Address no repositório) na array "addressArrays" (já está com um Mac Address que eu acredito
+ * fortemente que seja o certo, mas se der errado, é só subir o código no Doente e verificar)e setar o Dip Switch 
+ * para que o valor 1 (levando em conta que a array "addressArrays" só possui um elemento. 
+ * 
+ * --------CUIDADOS----------
+ * -Verificar se as portas estão ligadas conforme o código. Eu tentei deixar o mais intuitivo o possível para caso seja
+ * necessário substituir algo no próprio código.
+ */
 // --------------------- PINOS DOS ANALÓGICOS --------------//
-#define potPinD 35  // está marcado como D32 no DevKit
-#define potPinV 34      // está marcado como VN no DevKit
+#define potPinD 35  // está marcado como D35 no DevKit
+#define potPinV 34      // está marcado como D34 no DevKit
 
 //---------------- PINOS DO DIP SWITCH ---------------//
 #define switch1 9 
@@ -21,8 +36,8 @@
 #define LED 2   //LED para verificação de status da comunicação
 #define CAL 15  //Pino usado para calibrar os joysticks
 
-int valorDir = 0;
-int valorSpd = 0;
+int valorDir = 0; //valor do analógico direito
+int valorSpd = 0; //valor do analógico esquerdo
 
 int statusCom = 0; //status da comunicação
 int contValidacao = 0; //contador para validar a comunicação
@@ -59,8 +74,8 @@ PINO 32 -- DIREITA OU ESQUERDA (potenciômetro)
 PINO 39 -- FRENTE OU TRÁS (potenciômetro)
 */
 
-uint8_t addressArrays[4][6] = {} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES
-uint8_t broadcastAddress[6] = {}; //COLOQUE os valores do endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}
+uint8_t addressArrays[4][6] = {{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES 
+uint8_t broadcastAddress[6] = {}; //Endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}, o valor será atribuído no decorrer do código
 
 //Estrutura da mensagem que será enviada
 //DEVE SER A MESMA ESTRUTURA NO RECEPTOR
@@ -295,6 +310,7 @@ void setup() {
   register_peer(lastBroadcastIndex);
 }
 
+//Função que lê o estado do dip switch e retorna o índice da array de endereços em que se encontra o mac address do robô desejado
 int getIndex(){
   broadcastIndex = (1*(!digitalRead(switch1))
   + 2*(!digitalRead(switch2))
@@ -309,8 +325,9 @@ int getIndex(){
   return broadcastIndex;
 }
 
+//Função que realiza o pareamento do controle com o robô desejado
 void register_peer(int broadcastIndex){
-  memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); // Indica o MacAddress com base no dip switch
+  memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); // Escreve o mac address do robô desejado na variável broadcastAddress
   esp_now_peer_info_t peerInfo;
   // Registra o dispositivo que receberá os dados (peer)
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
@@ -329,7 +346,7 @@ void loop() {
     register_peer(broadcastIndex);
   }
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6);
-  lastBroadcastIndex = broadcastIndex;
+  lastBroadcastIndex = broadcastIndex; // atribui valor de índice para fazer a comparação na próxima iteração
   
   if (digitalRead(CAL) == 1 && temp == 0 && cal == 0){ //inicializa a contagem de tempo para começar a calbração
       temp = millis(); 
