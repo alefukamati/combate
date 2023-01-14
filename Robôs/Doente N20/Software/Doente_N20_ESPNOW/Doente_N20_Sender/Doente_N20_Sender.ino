@@ -73,13 +73,6 @@ int maiorRY = 4095;
 //---------- ----------------------- ---------------- //
 
 
-/*
-PINOS UTILIZADOS
-ENTRADAS
-PINO 32 -- DIREITA OU ESQUERDA (potenciômetro)
-PINO 39 -- FRENTE OU TRÁS (potenciômetro)
-*/
-
 uint8_t addressArrays[4][6] = {{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES 
 uint8_t broadcastAddress[6] = {}; //Endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}, o valor será atribuído no decorrer do código
 
