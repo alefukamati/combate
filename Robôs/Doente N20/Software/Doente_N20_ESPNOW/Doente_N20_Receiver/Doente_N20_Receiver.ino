@@ -12,11 +12,11 @@
 #define LED 2
 
 /*
-PINOS UTILIZADOS
-SAÍDAS
-PINO 16 - RODA ESQUERDA
-PINO 17 - RODA DIREITA
-*/
+ *Pode ser que entre a linha 105 e 123 haja alguma confusão nas portas
+ *do PWM. Caso o sentido de rotação esteja diferindo nos testes, essa
+ *é uma possível causa, mas basta consertar no código.
+ */
+
 
 int SpdRight = 0;
 int SpdLeft = 0;
