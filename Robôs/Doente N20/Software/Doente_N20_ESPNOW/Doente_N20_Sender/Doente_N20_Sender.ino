@@ -1,7 +1,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-/*Falta criar condições para fazer cada botão funcionar de maneira diferente com base no robô selecionado
+/* Falta criar condições para fazer cada botão funcionar de maneira diferente com base no robô selecionado
  * de forma que o código seja um só para controlar todos os robôs. De forma geral, só falta juntar o código 
  * dos robôs. Pode ser que exista alguma dificuldade em fazer com que a array enviada seja igual para todos os
  * robôs, mas nada muito além disso.
@@ -15,7 +15,12 @@
  * --------CUIDADOS----------
  * -Verificar se as portas estão ligadas conforme o código. Eu tentei deixar o mais intuitivo o possível para caso seja
  * necessário substituir algo no próprio código.
+ * 
+ * -Verificar no início da função setup como estão declarados os botões e switches. Pode ser que seja necessário definir
+ * ou alterar os INPUTs para INPUT_PULLUP ou PULLDOWN dependendo da ligação.
  */
+
+ 
 // --------------------- PINOS DOS ANALÓGICOS --------------//
 #define potPinD 35  // está marcado como D35 no DevKit
 #define potPinV 34      // está marcado como D34 no DevKit
@@ -46,6 +51,7 @@ int atualValidacao = 0; //estado atual da validação
 int broadcastIndex = 1; //índice para o Mac Address no array de Mac Addresses
 int lastBroadcastIndex = 1;
 int inv = 1; //indica se o sentido de locomoção está invertido
+
 //---------- VARIÁVEIS DE CALIBRAÇÃO ---------------- //
 int cal = 0;
 int temp = 0;
@@ -283,7 +289,7 @@ void setup() {
   pinMode(potPinD, INPUT);
   pinMode(potPinV, INPUT);
 
-  pinMode(B1, INPUT);
+  pinMode(B1, INPUT); //Botões
   pinMode(B2, INPUT);
   pinMode(B3, INPUT);
   pinMode(B4, INPUT);
