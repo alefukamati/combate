@@ -110,9 +110,9 @@ void loop() {
     digitalWrite(A1,0);
     digitalWrite(A2,1);
   }
-  ledcWrite(5, abs(myData.leftSpd));
+  ledcWrite(5, abs(myData.rightSpd));
 
-  if(myData.rightSpd > 0){
+  if(myData.leftSpd > 0){
     digitalWrite(B1,1);
     digitalWrite(B2,0);
   }
@@ -120,7 +120,7 @@ void loop() {
     digitalWrite(B1,0);
     digitalWrite(B2,1);
   }
-  ledcWrite(6, abs(myData.rightSpd));
+  ledcWrite(6, abs(myData.leftSpd));
 
 
   Serial.print("SpdRight: ");
