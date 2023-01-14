@@ -211,7 +211,7 @@ while(PS4.isConnected()) {
       motors_controlR(90,90); // Envia velocidade nula no failsafe
       // Os pinos dos motores de flip são setados como LOW
       Serial.println("Restart");
-      setup();
+      ESP.restart();
       delay(20);
     }
 }
