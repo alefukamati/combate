@@ -95,7 +95,7 @@ void loop() {
     SpdLeft = map(0, -100, 100, -180, 180);
     digitalWrite(LED, LOW);
   }else{
-    SpdRight = map(myData.rightSpd, -100, 100, -180, 180);   // Realiza a conversão para valores entre 0 e 180 para o motor da direita
+    SpdRight = map(myData.rightSpd, -100, 100, -255, 255);   // Realiza a conversão para valores entre 0 e 180 para o motor da direita
     SpdLeft = map(myData.leftSpd, -100, 100, -180, 180); // Realiza a conversão para valores entre 0 e 180 para o motor da esquerda
     digitalWrite(LED, HIGH);
   }
@@ -128,4 +128,5 @@ void loop() {
   Serial.print("\t");
   Serial.print("SpdLeft: ");
   Serial.println(SpdLeft);
+  delay(10);
 }

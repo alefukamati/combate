@@ -452,4 +452,5 @@ void loop() {
             contValidacao = 0;
         } 
   }
+  delay(20);
 }
