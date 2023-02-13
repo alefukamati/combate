@@ -1,4 +1,4 @@
-# <img src= "https://i.ibb.co/pb52hjy/neon.png" height ="35" width ="35" background-color:transparent /> Combate 
+# <img src= "./52687302733_758223e881_o.png" height ="35" width ="35" background-color:transparent /> Combate 
 
 Repositório de arquivos do squad de combate da Project Neon. O repositório está divido com relação aos projetos da equipe, sendo que atualmente a equipe possui 2 robôs na categoria _Antweight_ (454 g):
 - `Doente:` robô do tipo rampa móvel, controlado por motores brushless através de locomoção tangenciada;
