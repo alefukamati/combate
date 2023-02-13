@@ -1,4 +1,4 @@
-# <img src= "https://live.staticflickr.com/65535/52687302733_022da3c6ca_n.png" height ="35" width ="35" /> Combate 
+# <img src= "https://i.ibb.co/pb52hjy/neon.png" height ="35" width ="35" background-color:transparent /> Combate 
 
 Repositório de arquivos do squad de combate da Project Neon. O repositório está divido com relação aos projetos da equipe, sendo que atualmente a equipe possui 2 robôs na categoria _Antweight_ (454 g):
 - `Doente:` robô do tipo rampa móvel, controlado por motores brushless através de locomoção tangenciada;
@@ -22,3 +22,4 @@ A configuração do sistema para o uso da Arduino IDE com a ESP32 pode ser feita
 1. Primeiramente deve ser realizada a instalação do driver para o chip de conversão USB-Serial - esse driver permite a ESP32 seja reconhecida pelo sistema. O chip pode variar em relação ao modelo da ESP32 utilizado, porém os mais comuns são o [CH340](https://www.blogdarobotica.com/2020/03/21/instalando-driver-serial-para-arduinos-com-chip-ch340/) e o [CP2102](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads).
 2. A segunda etapa é adicionar a ESP32 ao gerenciador de placas da Arduino IDE, isso pode ser feito diretamente pelas configurações da Arduino IDE através de algumas [etapas](https://www.fernandok.com/2018/09/instalando-esp32-no-arduino-ide-metodo.html).
 3. Agora, é necessário adicionar as bibliotecas utilizadas para nos nossos códigos. Essas bibliotecas se encontram no próprio repositório, sendo elas `PS4-ESP32` e `Arduino-ESP32-Servo.`
+4. Por fim, é necessário instalar o [SixAxis Pair Tool](https://sixaxispairtool.en.lo4d.com/download). Este _software_ é necessário para o caso dos códigos que utilizam o controle de PS4. Essa ferramenta permite atribuir um endereço MAC ao controle de PS4. A atribuição do endereço é importante pois esse endereço deve ser incluído no código do robô para fazer o pareamento com o controle.
