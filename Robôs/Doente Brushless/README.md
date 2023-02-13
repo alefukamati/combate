@@ -1,2 +1,2 @@
 # Doente
-<img src= "https://live.staticflickr.com/65535/52686287157_f60de71f6d_n.jpg" height = "400" width = "1000" />
+<img src= "https://live.staticflickr.com/65535/52686287157_f60de71f6d_n.jpg" height = "1280" width = "720" />
