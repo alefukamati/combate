@@ -1,6 +1,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+
 /* Falta criar condições para fazer cada botão funcionar de maneira diferente com base no robô selecionado
  * de forma que o código seja um só para controlar todos os robôs. De forma geral, só falta juntar o código 
  * dos robôs. Pode ser que exista alguma dificuldade em fazer com que a array enviada seja igual para todos os
@@ -22,14 +23,14 @@
 
  
 // --------------------- PINOS DOS ANALÓGICOS --------------//
-#define potPinD 35  // está marcado como D35 no DevKit
-#define potPinV 34      // está marcado como D34 no DevKit
+#define potPinD 26  
+#define potPinV 25      
 
 //---------------- PINOS DO DIP SWITCH ---------------//
-#define switch1 9 
-#define switch2 3
-#define switch3 26
-#define switch4 28
+#define switch1 33 
+#define switch2 32
+#define switch3 35
+#define switch4 34
 
 //---------------- PINOS DOS BOTÕES ---------------//
 #define B1 14
@@ -50,7 +51,8 @@ int lastValidacao = 0; //estado da ultima validação
 int atualValidacao = 0; //estado atual da validação
 int broadcastIndex = 1; //índice para o Mac Address no array de Mac Addresses
 int lastBroadcastIndex = 1;
-int inv = 1; //indica se o sentido de locomoção está invertido
+int inv = -1; //indica se o sentido de locomoção está invertido
+
 
 //---------- VARIÁVEIS DE CALIBRAÇÃO ---------------- //
 int cal = 0;
@@ -73,7 +75,7 @@ int maiorRY = 4095;
 //---------- ----------------------- ---------------- //
 
 
-uint8_t addressArrays[4][6] = {{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES 
+uint8_t addressArrays[4][6] = {{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}, {0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}} ;// INSERIR 4 MAC ADDRESSES RELATIVOS A ESPS RECEPTORAS DIFERENTES 
 uint8_t broadcastAddress[6] = {}; //Endereço MAC do receptor ex:{0x08, 0x3A, 0xF2, 0x50, 0xE0, 0x30}, o valor será atribuído no decorrer do código
 
 //Estrutura da mensagem que será enviada
@@ -83,6 +85,11 @@ typedef struct struct_message {
   int spdLeft;
   String dir;
   int cont;
+  int dip_switch;
+  int b1;
+  int b2;
+  int b3;
+  int b4;
 } struct_message;
 
 
@@ -99,6 +106,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
       statusCom = 0; //Delivery Fail
   }
 }
+
 
 void calibracao(){
   //Ao iniciar, atualizamos o valor de "temp" e fazemos um "reset" na outras variáveis
@@ -272,6 +280,7 @@ void calibracao(){
   }
 }
  
+
 void setup() {
   // Inicia o monitor Serial
   Serial.begin(115200);
@@ -287,27 +296,47 @@ void setup() {
   pinMode(B3, INPUT);
   pinMode(B4, INPUT);
 
-  pinMode(switch1, INPUT_PULLUP);
-  pinMode(switch2, INPUT_PULLUP);
-  pinMode(switch3, INPUT_PULLUP);
-  pinMode(switch4, INPUT_PULLUP); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP 
+  pinMode(switch1, INPUT);
+  pinMode(switch2, INPUT);
+  pinMode(switch3, INPUT);
+  pinMode(switch4, INPUT); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP 
   //Se não forem PULLUP, a função getIndex deverá ser alterada retirando os !
 
+  /*lastBroadcastIndex = (1*(!digitalRead(switch1))
+  + 2*(!digitalRead(switch2))
+  + 3*(!digitalRead(switch3))
+  + 4*(!digitalRead(switch4)));//define o índice*/
   lastBroadcastIndex = getIndex();
+  memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); //define a variável broa
   // Configura o ESP32 como um Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
   // Inicia o ESP-NOW
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
+    ESP.restart();
     return;
   }
 
   //Configura a função de callback que será chamada ao enviar algum dado
   esp_now_register_send_cb(OnDataSent);
+  //Serial.print("Mac: ");
+  //Serial.print(addressArrays[lastBroadcastIndex]);
+  //Serial.print("\t");
+  // Registra o dispositivo que receberá os dados (peer)
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
   
-  register_peer(lastBroadcastIndex);
+  // Adiciona o dispositivo que receberá os dados (peer)  
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+  //registerPeer(lastBroadcastIndex);
 }
+
+
 
 //Função que lê o estado do dip switch e retorna o índice da array de endereços em que se encontra o mac address do robô desejado
 int getIndex(){
@@ -315,17 +344,25 @@ int getIndex(){
   + 2*(!digitalRead(switch2))
   + 3*(!digitalRead(switch3))
   + 4*(!digitalRead(switch4))); //define o índice da array de mac adrresses com base no dip switch
+
   if(broadcastIndex == 0){
     broadcastIndex = 1;
   }
-  else{
-    broadcastIndex = broadcastIndex - 1;
+  if(broadcastIndex > 4){
+    broadcastIndex = 1;
+  //  Serial.println("Valor de Dip Switch maior que o permitido");
   }
+  broadcastIndex = broadcastIndex - 1;
+  Serial.print("Dip Switch: ");
+  Serial.println(broadcastIndex);
   return broadcastIndex;
 }
 
+
 //Função que realiza o pareamento do controle com o robô desejado
-void register_peer(int broadcastIndex){
+/*
+void registerPeer(int broadcastIndex){
+
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); // Escreve o mac address do robô desejado na variável broadcastAddress
   esp_now_peer_info_t peerInfo;
   // Registra o dispositivo que receberá os dados (peer)
@@ -335,18 +372,23 @@ void register_peer(int broadcastIndex){
   // Adiciona o dispositivo que receberá os dados (peer) 
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
+    ESP_restart();
     return;
   }
 }
 
+*/
+
 void loop() {
-  broadcastIndex = getIndex(); //define o índice
+  Serial.print("Dip Switch: ");
+  Serial.println(broadcastIndex);
+  /*broadcastIndex = getIndex();
+  mySpd.dip_switch = broadcastIndex;
   if (broadcastIndex != lastBroadcastIndex){ //se o índice for diferente do anterior, registra o novo dispositivo
-    register_peer(broadcastIndex);
+    ESP.restart();
   }
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6);
-  lastBroadcastIndex = broadcastIndex; // atribui valor de índice para fazer a comparação na próxima iteração
-  
+  lastBroadcastIndex = broadcastIndex; // atribui valor de índice para fazer a comparação na próxima iteração */
   if (digitalRead(CAL) == 1 && temp == 0 && cal == 0){ //inicializa a contagem de tempo para começar a calbração
       temp = millis(); 
   }else if (digitalRead(CAL) == 1 && (millis() - temp) > 5000 && cal == 0){ 
@@ -367,11 +409,31 @@ void loop() {
         calibracao();
   }else{
         if(digitalRead(B1) == 1){ //Sentido de rotação normal quando B1 é acionado
-          inv = 1;
+          mySpd.b1 = 1;
+        }
+        else{
+          mySpd.b1 = 0;
         }
 
         if(digitalRead(B2) == 1){ //Inverte o sentido de rotação quando B2 é acionado
-          inv = -1;
+          mySpd.b2 = 1;
+        }
+        else{
+          mySpd.b2 = 0;
+        }
+
+        if(digitalRead(B3) == 1){ //Inverte o sentido de rotação quando B2 é acionado
+          mySpd.b3 = 1;
+        }
+        else{
+          mySpd.b3 = 0;
+        }
+
+        if(digitalRead(B4) == 1){ //Inverte o sentido de rotação quando B2 é acionado
+          mySpd.b4 = 1;
+        }
+        else{
+          mySpd.b4 = 0;
         }
         valorDir = analogRead(potPinD);
         valorSpd = analogRead(potPinV);
@@ -406,7 +468,7 @@ void loop() {
             mySpd.dir = "CENTRO";
         }
 
-        Serial.print("VD: ");
+        /*Serial.print("VD: ");
         Serial.print(mySpd.spdRight);
         Serial.print("\t");
         Serial.print("VE: ");
@@ -418,7 +480,20 @@ void loop() {
         Serial.print("DIR: ");
         Serial.print(mySpd.dir);
         Serial.println("\t");
-
+        //Serial.print("DipSwitch: ");
+        //Serial.print(mySpd.dip_switch);
+        Serial.print("\t");
+        Serial.print("B1: ");
+        Serial.print(mySpd.b1);
+        Serial.print("B2: ");
+        Serial.println(mySpd.b2);
+        Serial.print("B3: ");
+        Serial.print(mySpd.b3);
+        Serial.print("\t");
+        Serial.print("B4: ");
+        Serial.print(mySpd.b4);  
+        Serial.println();
+        */
         mySpd.cont = contValidacao; 
 
 

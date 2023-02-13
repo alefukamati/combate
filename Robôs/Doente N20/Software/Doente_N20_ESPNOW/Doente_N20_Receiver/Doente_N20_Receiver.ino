@@ -1,6 +1,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
-#include <ESP32Servo.h> 
+
 //Locomocão 
 #define PWMA 27
 #define PWMB 26
@@ -30,6 +30,11 @@ typedef struct struct_message {
   int leftSpd;  //recebe o valor da velocidade da esquerda
   String Dir; //recebe o valor da direção
   int val;
+  int dip_switch;
+  int b1;
+  int b2;
+  int b3;
+  int b4;
 } struct_message;
 
 
@@ -47,10 +52,23 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("VE: ");
   Serial.print(myData.leftSpd);
   Serial.print("\t");
-  Serial.print("DIR: ");
-  Serial.print(myData.Dir);
+ // Serial.print("DIR: ");
+  //Serial.print(myData.Dir);
   Serial.println();
-  
+ /* Serial.print("DipSwitch: ");
+  Serial.print(myData.dip_switch);
+  Serial.print("\t"); */
+  Serial.print("B1: ");
+  Serial.print(myData.b1);
+  Serial.print("\t");
+  Serial.print("B2: ");
+  Serial.println(myData.b2);
+  Serial.print("B3: ");
+  Serial.print(myData.b3);
+  Serial.print("\t");
+  Serial.print("B4: ");
+  Serial.print(myData.b4);  
+  Serial.println();
 }
 
 void setup() {
@@ -81,6 +99,7 @@ void setup() {
   // Inicia o ESP-NOW
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
+    ESP.restart();
     return;
   }
   
@@ -91,42 +110,42 @@ void setup() {
 void loop() {
   
   if (myData.val == lastVal){
-    SpdRight = map(0, -100, 100, -180, 180);
-    SpdLeft = map(0, -100, 100, -180, 180);
+    SpdRight = map(0, -100, 100, -255, 255);
+    SpdLeft = map(0, -100, 100, -255, 255);
     digitalWrite(LED, LOW);
   }else{
     SpdRight = map(myData.rightSpd, -100, 100, -255, 255);   // Realiza a conversão para valores entre 0 e 180 para o motor da direita
-    SpdLeft = map(myData.leftSpd, -100, 100, -180, 180); // Realiza a conversão para valores entre 0 e 180 para o motor da esquerda
+    SpdLeft = map(myData.leftSpd, -100, 100, -255, 255); // Realiza a conversão para valores entre 0 e 180 para o motor da esquerda
     digitalWrite(LED, HIGH);
   }
 
   lastVal = myData.val;
 
   if(myData.rightSpd > 0){
-    digitalWrite(A1,1);
-    digitalWrite(A2,0);
-  }
-  else{
     digitalWrite(A1,0);
     digitalWrite(A2,1);
   }
-  ledcWrite(5, abs(myData.rightSpd));
+  else{
+    digitalWrite(A1,1);
+    digitalWrite(A2,0);
+  }
+  ledcWrite(5, abs(SpdRight));
 
   if(myData.leftSpd > 0){
-    digitalWrite(B1,1);
-    digitalWrite(B2,0);
-  }
-  else{
     digitalWrite(B1,0);
     digitalWrite(B2,1);
   }
-  ledcWrite(6, abs(myData.leftSpd));
+  else{
+    digitalWrite(B1,1);
+    digitalWrite(B2,0);
+  }
+  ledcWrite(6, abs(SpdLeft));
 
 
-  Serial.print("SpdRight: ");
+ /* Serial.print("SpdRight: ");
   Serial.print(SpdRight);
   Serial.print("\t");
   Serial.print("SpdLeft: ");
-  Serial.println(SpdLeft);
-  delay(10);
+  Serial.println(SpdLeft); */
+  delay(20);
 }
