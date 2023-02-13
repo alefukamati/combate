@@ -1,4 +1,4 @@
-<img src=”https://live.staticflickr.com/65535/52687302733_022da3c6ca_n.png”>  Combate 
+# <img src=”https://live.staticflickr.com/65535/52687302733_022da3c6ca_n.jpg”>  Combate 
 Repositório de arquivos do squad de combate da Project Neon. O repositório está divido com relação aos projetos da equipe, sendo que atualmente a equipe possui 2 robôs na categoria _Antweight_ (454 g):
 - Doente: robô do tipo rampa móvel, controlado por motores brushless através de locomoção tangenciada;
 - Cirrose: robô de arma ativa do tipo _vertical spinner_ controlado por motores N20.
