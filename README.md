@@ -3,6 +3,7 @@ Repositório de arquivos do squad de combate da Project Neon. O repositório est
  - Eletrônica;
  - Mecânica;
  - Software.
+ 
  Em cada diretório relacionado a esses núcleos, serão encontrados os arquivos e informações à respeito do desenvolvimento.
 
 
