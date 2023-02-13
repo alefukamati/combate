@@ -340,7 +340,12 @@ void setup() {
 
 //Função que lê o estado do dip switch e retorna o índice da array de endereços em que se encontra o mac address do robô desejado
 int getIndex(){
-  broadcastIndex = (1*(!digitalRead(switch1))
+  if (digitalRead(switch1) == 1 && digitalRead(switch2) == 0 && digitalRead(switch3) == 0 && digitalRead(switch4) == 0) broadcastIndex = 0;
+  elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 1 && digitalRead(switch3) == 0 && digitalRead(switch4) == 0) broadcastIndex = 1;
+  elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 0 && digitalRead(switch3) == 1 && digitalRead(switch4) == 0) broadcastIndex = 2;
+  elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 0 && digitalRead(switch3) == 0 && digitalRead(switch4) == 1) broadcastIndex = 3;
+  else broadcastIndex = 0;
+/*  broadcastIndex = (1*(!digitalRead(switch1))
   + 2*(!digitalRead(switch2))
   + 3*(!digitalRead(switch3))
   + 4*(!digitalRead(switch4))); //define o índice da array de mac adrresses com base no dip switch
@@ -354,7 +359,7 @@ int getIndex(){
   }
   broadcastIndex = broadcastIndex - 1;
   Serial.print("Dip Switch: ");
-  Serial.println(broadcastIndex);
+  Serial.println(broadcastIndex);*/
   return broadcastIndex;
 }
 
