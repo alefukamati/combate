@@ -85,11 +85,6 @@ typedef struct struct_message {
   int spdLeft;
   String dir;
   int cont;
-  int dip_switch;
-  int b1;
-  int b2;
-  int b3;
-  int b4;
 } struct_message;
 
 
@@ -291,8 +286,8 @@ void setup() {
   pinMode(potPinD, INPUT);
   pinMode(potPinV, INPUT);
 
-  pinMode(B1, INPUT); //Botões
-  pinMode(B2, INPUT);
+  pinMode(B1, INPUT_PULLDOWN); //Botões
+  pinMode(B2, INPUT_PULLDOWN);
   //pinMode(B3, INPUT);
  // pinMode(B4, INPUT);
 
@@ -416,6 +411,7 @@ void loop() {
   }else{
         if(digitalRead(B1) == 1){ //Sentido de rotação normal quando B1 é acionado
           mySpd.b1 = 1;
+          inv = 1;
           Serial.print("B1: ");
           Serial.print(mySpd.b1);
         }
@@ -425,6 +421,7 @@ void loop() {
 
         if(digitalRead(B2) == 1){ //Inverte o sentido de rotação quando B2 é acionado
           mySpd.b2 = 1;
+          inv = -1;
           Serial.print("B2: ");
           Serial.print(mySpd.b2);
         }

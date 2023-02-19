@@ -30,11 +30,6 @@ typedef struct struct_message {
   int leftSpd;  //recebe o valor da velocidade da esquerda
   String Dir; //recebe o valor da direção
   int val;
-  int dip_switch;
-  int b1;
-  int b2;
-  int b3;
-  int b4;
 } struct_message;
 
 
@@ -52,23 +47,6 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("VE: ");
   Serial.print(myData.leftSpd);
   Serial.print("\t");
- // Serial.print("DIR: ");
-  //Serial.print(myData.Dir);
-  Serial.println();
- /* Serial.print("DipSwitch: ");
-  Serial.print(myData.dip_switch);
-  Serial.print("\t"); */
-  Serial.print("B1: ");
-  Serial.print(myData.b1);
-  Serial.print("\t");
-  Serial.print("B2: ");
-  Serial.println(myData.b2);
-  Serial.print("B3: ");
-  Serial.print(myData.b3);
-  Serial.print("\t");
-  Serial.print("B4: ");
-  Serial.print(myData.b4);  
-  Serial.println();
 }
 
 void setup() {
