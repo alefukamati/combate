@@ -23,24 +23,24 @@
 
  
 // --------------------- PINOS DOS ANALÓGICOS --------------//
-#define potPinD 26  
-#define potPinV 25      
+#define potPinD 33  
+#define potPinV 32      
 
-//---------------- PINOS DO DIP SWITCH ---------------//
+/*//---------------- PINOS DO DIP SWITCH ---------------//
 #define switch1 33 
 #define switch2 32
 #define switch3 35
-#define switch4 34
+#define switch4 34*/
 
 //---------------- PINOS DOS BOTÕES ---------------//
-#define B1 14
-#define B2 15
-#define B3 24
-#define B4 25
+#define B1 12
+#define B2 18
+/*#define B3 18
+#define B4 5*/
 
 
 #define LED 2   //LED para verificação de status da comunicação
-#define CAL 15  //Pino usado para calibrar os joysticks
+//#define CAL 15  //Pino usado para calibrar os joysticks
 
 int valorDir = 0; //valor do analógico direito
 int valorSpd = 0; //valor do analógico esquerdo
@@ -285,7 +285,7 @@ void setup() {
   // Inicia o monitor Serial
   Serial.begin(115200);
   
-  pinMode(CAL, INPUT_PULLDOWN);
+ // pinMode(CAL, INPUT_PULLDOWN);
   pinMode(LED, OUTPUT);
   
   pinMode(potPinD, INPUT);
@@ -293,20 +293,21 @@ void setup() {
 
   pinMode(B1, INPUT); //Botões
   pinMode(B2, INPUT);
-  pinMode(B3, INPUT);
-  pinMode(B4, INPUT);
+  //pinMode(B3, INPUT);
+ // pinMode(B4, INPUT);
 
-  pinMode(switch1, INPUT);
+ /* pinMode(switch1, INPUT);
   pinMode(switch2, INPUT);
   pinMode(switch3, INPUT);
   pinMode(switch4, INPUT); //VERIFICAR SE OS PINOS SÃO DE FATO PULLUP 
   //Se não forem PULLUP, a função getIndex deverá ser alterada retirando os !
 
-  /*lastBroadcastIndex = (1*(!digitalRead(switch1))
+  lastBroadcastIndex = (1*(!digitalRead(switch1))
   + 2*(!digitalRead(switch2))
   + 3*(!digitalRead(switch3))
-  + 4*(!digitalRead(switch4)));//define o índice*/
-  broadcastIndex = getIndex();
+  + 4*(!digitalRead(switch4)));//define o índice
+  broadcastIndex = getIndex();*/
+  broadcastIndex = 0;
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6); //define a variável broa
   // Configura o ESP32 como um Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -337,14 +338,14 @@ void setup() {
 }
 
 
-
+/*
 //Função que lê o estado do dip switch e retorna o índice da array de endereços em que se encontra o mac address do robô desejado
 int getIndex(){
- /* if (digitalRead(switch1) == 1 && digitalRead(switch2) == 0 && digitalRead(switch3) == 0 && digitalRead(switch4) == 0) broadcastIndex = 0;
+  if (digitalRead(switch1) == 1 && digitalRead(switch2) == 0 && digitalRead(switch3) == 0 && digitalRead(switch4) == 0) broadcastIndex = 0;
   elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 1 && digitalRead(switch3) == 0 && digitalRead(switch4) == 0) broadcastIndex = 1;
   elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 0 && digitalRead(switch3) == 1 && digitalRead(switch4) == 0) broadcastIndex = 2;
   elif (digitalRead(switch1) == 0 && digitalRead(switch2) == 0 && digitalRead(switch3) == 0 && digitalRead(switch4) == 1) broadcastIndex = 3; 
-  else broadcastIndex = 0;*/
+  else broadcastIndex = 0;
  broadcastIndex = (1*(!digitalRead(switch1))
   + 2*(!digitalRead(switch2))
   + 3*(!digitalRead(switch3))
@@ -359,10 +360,10 @@ int getIndex(){
   }
   broadcastIndex = broadcastIndex - 1;
   Serial.print("Dip Switch: ");
-  Serial.println(broadcastIndex);*/
+  Serial.println(broadcastIndex);
   return broadcastIndex;
 }
-
+*/
 
 //Função que realiza o pareamento do controle com o robô desejado
 /*
@@ -385,26 +386,26 @@ void registerPeer(int broadcastIndex){
 */
 
 void loop() {
-  Serial.print("Dip Switch: ");
+ /* Serial.print("Dip Switch: ");
   Serial.println(broadcastIndex);
-  /*broadcastIndex = getIndex();
+  broadcastIndex = getIndex();
   mySpd.dip_switch = broadcastIndex;
   if (broadcastIndex != lastBroadcastIndex){ //se o índice for diferente do anterior, registra o novo dispositivo
     ESP.restart();
   }
   memcpy(broadcastAddress, addressArrays[broadcastIndex], 6);
   lastBroadcastIndex = broadcastIndex; // atribui valor de índice para fazer a comparação na próxima iteração */
-  if (digitalRead(CAL) == 1 && temp == 0 && cal == 0){ //inicializa a contagem de tempo para começar a calbração
+  if (digitalRead(B1) == 1 && digitalRead(B2) == 1 && temp == 0 && cal == 0){ //inicializa a contagem de tempo para começar a calbração
       temp = millis(); 
-  }else if (digitalRead(CAL) == 1 && (millis() - temp) > 5000 && cal == 0){ 
+  }else if (digitalRead(B1) == 1 && digitalRead(B2) == 1 && (millis() - temp) > 5000 && cal == 0){ 
       //Após 3 segundos com o botão pressionado, é dado inicio na calibração
       cal = 1;
       temp = 0;
-  }else if (digitalRead(CAL) == 1 && cal == 0){
+  }else if (digitalRead(B1) == 1 && digitalRead(B2) == 1 && cal == 0){
       //Mostra na tela quanto tempo o botão está sendo pressionado, antes de entrar na calibração
       Serial.print("iniciando calibracao...");
       Serial.println((millis()-temp)/1000);  
-  }else if (digitalRead(CAL) == 0 && cal == 0){
+  }else if ((digitalRead(B1) == 0 || digitalRead(B2) == 0)  && cal == 0){
       //Se soltar o botão antes dos 3s, o tempo é zerado
       temp = 0;
   }
@@ -415,6 +416,8 @@ void loop() {
   }else{
         if(digitalRead(B1) == 1){ //Sentido de rotação normal quando B1 é acionado
           mySpd.b1 = 1;
+          Serial.print("B1: ");
+          Serial.print(mySpd.b1);
         }
         else{
           mySpd.b1 = 0;
@@ -422,13 +425,17 @@ void loop() {
 
         if(digitalRead(B2) == 1){ //Inverte o sentido de rotação quando B2 é acionado
           mySpd.b2 = 1;
+          Serial.print("B2: ");
+          Serial.print(mySpd.b2);
         }
         else{
           mySpd.b2 = 0;
         }
 
-        if(digitalRead(B3) == 1){ //Inverte o sentido de rotação quando B2 é acionado
+/*        if(digitalRead(B3) == 1){ //Inverte o sentido de rotação quando B2 é acionado
           mySpd.b3 = 1;
+          Serial.print("B3: ");
+          Serial.print(mySpd.b3);
         }
         else{
           mySpd.b3 = 0;
@@ -436,10 +443,12 @@ void loop() {
 
         if(digitalRead(B4) == 1){ //Inverte o sentido de rotação quando B2 é acionado
           mySpd.b4 = 1;
+          Serial.print("B4: ");
+          Serial.print(mySpd.b4);
         }
         else{
           mySpd.b4 = 0;
-        }
+        }*/
         valorDir = analogRead(potPinD);
         valorSpd = analogRead(potPinV);
 
@@ -473,11 +482,11 @@ void loop() {
             mySpd.dir = "CENTRO";
         }
 
-        /*Serial.print("VD: ");
+        Serial.print("VD: ");
         Serial.print(mySpd.spdRight);
         Serial.print("\t");
         Serial.print("VE: ");
-        Serial.print(mySpd.spdLeft);
+        Serial.println(mySpd.spdLeft);/*
         Serial.print("\t");
         Serial.print("|INT: ");
         Serial.print(valorSpd);
