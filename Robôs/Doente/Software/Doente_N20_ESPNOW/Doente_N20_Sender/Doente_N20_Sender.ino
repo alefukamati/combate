@@ -52,6 +52,8 @@ int atualValidacao = 0; //estado atual da validação
 int broadcastIndex = 1; //índice para o Mac Address no array de Mac Addresses
 int lastBroadcastIndex = 1;
 int inv = -1; //indica se o sentido de locomoção está invertido
+int button1 = 0;
+int button2 = 0;
 
 
 //---------- VARIÁVEIS DE CALIBRAÇÃO ---------------- //
@@ -410,23 +412,23 @@ void loop() {
         calibracao();
   }else{
         if(digitalRead(B1) == 1){ //Sentido de rotação normal quando B1 é acionado
-          mySpd.b1 = 1;
+          button1 = 1;
           inv = 1;
           Serial.print("B1: ");
-          Serial.print(mySpd.b1);
+          Serial.print(button1);
         }
         else{
-          mySpd.b1 = 0;
+          button1 = 0;
         }
 
         if(digitalRead(B2) == 1){ //Inverte o sentido de rotação quando B2 é acionado
-          mySpd.b2 = 1;
           inv = -1;
+          button2 = 1;
           Serial.print("B2: ");
-          Serial.print(mySpd.b2);
+          Serial.print(button2);
         }
         else{
-          mySpd.b2 = 0;
+          button2 = 0;
         }
 
 /*        if(digitalRead(B3) == 1){ //Inverte o sentido de rotação quando B2 é acionado
