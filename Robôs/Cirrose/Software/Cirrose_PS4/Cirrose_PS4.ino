@@ -11,7 +11,7 @@
 
 //Setup pinos brushless
 #include <Servo_ESP32.h>
-static const int brushPin = 4; 
+static const int brushPin = 14; 
 Servo_ESP32 servo;
 int angle;
 
@@ -83,6 +83,11 @@ void setup(void) {
   digitalWrite(B1, 0);
   digitalWrite(B2, 0);
 
+  //Pino brushless, iniciado como parado
+   servo.attach(brushPin);
+   int angle = 0;
+   servo.write(angle);
+   Serial.println(angle);
 
   while(PS4.isConnected()!= true){
   delay(20);}
@@ -94,53 +99,46 @@ void loop() {
   //motors_control(linear_speed*multiplicador, angular_speed* multiplicador2);
   // Multiplicadcor = 1.8 para aumentar a velocidade linear, o quao rapido o robo vai ser
   // Multiplicadcor2 = multiplic_curva, parametro que varia de 1 ate a 2.3 para suavisar as curvas em alta velocidade
-    if(PS4.LStickY()<-15 || PS4.LStickY()>15){
-      int curva = map(abs(PS4.LStickY()), 0, 127, 80, 190);
-      float multiplic_curva = (float) curva/100;
-      motors_control(-2*inv*PS4.LStickY(), (0.8)*PS4.RStickX()/multiplic_curva);
+    if(PS4.LStickY()<-25 || PS4.LStickY()>25){
+      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX()/(1.2));
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
-      motors_control(-2*inv*PS4.LStickY(), (0.8)*PS4.RStickX()/0.8);
+      motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
 
     }
-      //Sentido de locomocao invertido
-      if(PS4.Down()){
-        inv = -1;
-        delay(100);
-      } 
-      if(PS4.Up()){
-        inv = 1;
-        delay(100);
+           
+      //inicio do Brushless - seta o piso do valor (primeiro beep)- Botão quadrado
+      if (PS4.Square()) { 
+          angle=40;
+          servo.write(angle);
+          Serial.println(angle);
+          delay(200);
       }
-    
-      //Sentido de locomocao principal
-      if(PS4.L3()){
-        inv = 1;
-        delay(100);
-      }
-              
-      //Função para arma ativa, aceleração gradativa/dinamica com o gatilho - Botão R2
-      if(PS4.R2()){ 
-      angle=map(PS4.R2Value(),0,255,40,140);
-      servo.write(angle);
-      Serial.println(angle); 
-      } 
 
-            //Função para arma ativa, aceleração discreta com o gatilho - Botão R1
+      //Função para arma ativa, aceleração discreta com o gatilho - Botão R1
       if (PS4.R1()){
         angle=angle+2;
         servo.write(angle);
         Serial.println(angle);
         delay(200);
     }
-
-        //inicio do Brushless - seta o piso do valor (primeiro beep)- Botão quadrado
-    if (PS4.Square()) { 
-        angle=40;
+        //Sentido de locomocao invertido - Botão Seta para baixo
+       if(PS4.Down()){
+          inv = -1;
+          delay(100);
+       }
+       //Sentido de locomocao principal
+        if(PS4.Up()){
+          inv = 1;
+          delay(100);
+       }
+        
+       //Função para arma ativa, aceleração gradativa/dinamica com o gatilho - Botão R2
+        if(PS4.R2()){ 
+        angle=map(PS4.R2Value(),0,255,40,140);
         servo.write(angle);
-        Serial.println(angle);
-        delay(200);
-    }
+        Serial.println(angle); 
+        } 
 
   }
     
@@ -150,6 +148,7 @@ void loop() {
   servo.write(angle);
   motors_control(0,0);
   Serial.println("Restart");
+  PS4.end();
   ESP.restart();
   delay(20);
   }

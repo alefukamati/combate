@@ -1,13 +1,13 @@
 //Biblioteca do controle de PS4
 #include <PS4Controller.h>
 
-//Locomocão 
-#define PWMA 27
-#define PWMB 26
-#define A1  13
-#define A2  12
-#define B2  25
-#define B1  33
+  //Setup pinos Locomocão Ponte H (TB6612fng)
+  #define PWMA 27
+  #define PWMB 26
+  #define A1 13
+  #define A2 12
+  #define B1 33
+  #define B2 25
 
 
 int inv = 1; //Permite inverter a pilotagem conforme o lado do robo que esta para cima
@@ -59,7 +59,7 @@ void setup(void) {
     delay(10); // will pause Zero, Leonardo, etc until serial console opens
 
 
-  PS4.begin("01:01:01:01:01:01");
+  PS4.begin("64:64:64:64:64:64");
   Serial.println("Ready.");
   
   ledcAttachPin(PWMA,5);
@@ -77,7 +77,6 @@ void setup(void) {
   digitalWrite(B1, 0);
   digitalWrite(B2, 0);
 
-
   while(PS4.isConnected()!= true){
   delay(20);}
 }
@@ -88,39 +87,21 @@ void loop() {
   //motors_control(linear_speed*multiplicador, angular_speed* multiplicador2);
   // Multiplicadcor = 1.8 para aumentar a velocidade linear, o quao rapido o robo vai ser
   // Multiplicadcor2 = multiplic_curva, parametro que varia de 1 ate a 2.3 para suavisar as curvas em alta velocidade
-    if(PS4.LStickY()<-15 || PS4.LStickY()>15){
-      int curva = map(abs(PS4.LStickY()), 0, 127, 80, 190);
-      float multiplic_curva = (float) curva/100;
-      motors_control(-2*inv*PS4.LStickY(), (0.8)*PS4.RStickX()/multiplic_curva);
+    if(PS4.LStickY()<-25 || PS4.LStickY()>25){
+      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX()/(1.2));
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
-      motors_control(-2*inv*PS4.LStickY(), (0.8)*PS4.RStickX()/0.8);
+      motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
 
     }
-      //Sentido de locomocao invertido
-      if(PS4.Down()){
-        inv = -1;
-        delay(100);
-      } 
-      if(PS4.Up()){
-        inv = 1;
-        delay(100);
-      }
-    
-      //Sentido de locomocao principal
-      if(PS4.L3()){
-        inv = 1;
-        delay(100);
-      }
-
   }
     
   //Failsafe
   if(PS4.isConnected()!= true){
   motors_control(0,0);
   Serial.println("Restart");
+  PS4.end();
   ESP.restart();
   delay(20);
   }
-  
 }
