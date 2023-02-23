@@ -17,7 +17,7 @@ Os arquivos referentes a eles estão separados com base nos núcleos que constit
  Em cada diretório relacionado a esses núcleos, serão encontrados os arquivos e informações à respeito do desenvolvimento.
 
 # Instalação
-Para realizar o carregamento dos códigos nos robôs, é necessário que alguns programas estejam instalados no computador. A IDE utilizada para o desenvolvimento dos códigos é a **Arduino IDE**, que fornece uma forma bem simples de realizar o desenvolvimento dos códigos para a ESP32.
+Para realizar o upload dos códigos nos robôs, é necessário que alguns programas estejam instalados no computador. A IDE utilizada para o desenvolvimento dos códigos é a **Arduino IDE**, que fornece uma forma bem simples de realizar o desenvolvimento dos códigos para a ESP32.
 A configuração do sistema para o uso da Arduino IDE com a ESP32 pode ser feita através das seguintes etapas:
 1. Primeiramente deve ser realizada a instalação do driver para o chip de conversão USB-Serial - esse driver permite a ESP32 seja reconhecida pelo sistema. O chip pode variar em relação ao modelo da ESP32 utilizado, porém os mais comuns são o [CH340](https://www.blogdarobotica.com/2020/03/21/instalando-driver-serial-para-arduinos-com-chip-ch340/) e o [CP2102](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads).
 2. A segunda etapa é adicionar a ESP32 ao gerenciador de placas da Arduino IDE, isso pode ser feito diretamente pelas configurações da Arduino IDE através de algumas [etapas](https://www.fernandok.com/2018/09/instalando-esp32-no-arduino-ide-metodo.html).
