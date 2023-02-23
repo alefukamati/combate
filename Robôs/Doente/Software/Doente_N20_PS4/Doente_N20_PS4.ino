@@ -92,7 +92,16 @@ void loop() {
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
       motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
+    }
 
+  //Sentido de locomocao invertido
+    if(PS4.Down()){
+      inv = -1;
+      delay(100);
+    } 
+    if(PS4.Up()){
+      inv = 1;
+      delay(100);
     }
   }
     
