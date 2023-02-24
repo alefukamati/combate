@@ -10,10 +10,13 @@
   #define B2  25
 
 //Setup pinos brushless
-#include <Servo_ESP32.h>
-static const int brushPin = 14; 
-Servo_ESP32 servo;
-int angle;
+#include <ESP32Servo.h>
+int ESCPin = 14; 
+int frequenciaESC = 50;
+int Ppm_Min_Throttle = 1048;
+int Ppm_Max_Throttle = 1952;
+Servo ESC;
+int angle = 0;
 
 
 int inv = 1; //Permite inverter a pilotagem conforme o lado do robo que esta para cima
@@ -84,10 +87,8 @@ void setup(void) {
   digitalWrite(B2, 0);
 
   //Pino brushless, iniciado como parado
-   servo.attach(brushPin);
-   int angle = 0;
-   servo.write(angle);
-   Serial.println(angle);
+    ESC.setPeriodHertz(frequenciaESC);
+    ESC.attach(ESCPin, Ppm_Min_Throttle, Ppm_Max_Throttle);
 
   while(PS4.isConnected()!= true){
   delay(20);}
@@ -99,26 +100,38 @@ void loop() {
   //motors_control(linear_speed*multiplicador, angular_speed* multiplicador2);
   // Multiplicadcor = 1.8 para aumentar a velocidade linear, o quao rapido o robo vai ser
   // Multiplicadcor2 = multiplic_curva, parametro que varia de 1 ate a 2.3 para suavisar as curvas em alta velocidade
-    if(PS4.LStickY()<-25 || PS4.LStickY()>25){
-      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX()/(1.2));
+     if(PS4.LStickY()<-25 || PS4.LStickY()>25){
+      motors_control((1.8)*inv*PS4.LStickY(),(1.3)*PS4.RStickX());
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
-      motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
+      motors_control((inv)*PS4.LStickY(), (1.5)*PS4.RStickX());
 
-    }
-           
+    }      
       //inicio do Brushless - seta o piso do valor (primeiro beep)- Botão quadrado
-      if (PS4.Square()) { 
-          angle=40;
-          servo.write(angle);
+      if (PS4.Cross()) { 
+          angle=0;
+          ESC.write(angle);
           Serial.println(angle);
-          delay(200);
+          delay(100);
       }
-
+      if (PS4.Square()) { 
+          angle=0;
+          ESC.write(angle);
+          Serial.println(angle);
+          delay(500);
+          angle=180;
+          ESC.write(angle);
+          Serial.println(angle);
+          delay(500);
+          angle=0;
+          ESC.write(angle);
+          Serial.println(angle);
+          delay(500);
+      }
       //Função para arma ativa, aceleração discreta com o gatilho - Botão R1
       if (PS4.R1()){
         angle=angle+2;
-        servo.write(angle);
+        ESC.write(angle);
         Serial.println(angle);
         delay(200);
     }
@@ -135,8 +148,8 @@ void loop() {
         
        //Função para arma ativa, aceleração gradativa/dinamica com o gatilho - Botão R2
         if(PS4.R2()){ 
-        angle=map(PS4.R2Value(),0,255,40,140);
-        servo.write(angle);
+        angle=map(PS4.R2Value(),0,255,0,90);
+        ESC.write(angle);
         Serial.println(angle); 
         } 
 
@@ -145,7 +158,7 @@ void loop() {
   //Failsafe
   if(PS4.isConnected()!= true){
   angle = 0;
-  servo.write(angle);
+  ESC.write(angle);
   motors_control(0,0);
   Serial.println("Restart");
   PS4.end();
