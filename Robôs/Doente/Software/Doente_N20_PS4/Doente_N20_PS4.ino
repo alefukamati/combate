@@ -87,11 +87,12 @@ void loop() {
   //motors_control(linear_speed*multiplicador, angular_speed* multiplicador2);
   // Multiplicadcor = 1.8 para aumentar a velocidade linear, o quao rapido o robo vai ser
   // Multiplicadcor2 = multiplic_curva, parametro que varia de 1 ate a 2.3 para suavisar as curvas em alta velocidade
-    if(PS4.LStickY()<-25 || PS4.LStickY()>25){
-      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX()/(1.2));
+     if(PS4.LStickY()<-25 || PS4.LStickY()>25){
+      motors_control((1.8)*inv*PS4.LStickY(),(1.3)*PS4.RStickX());
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
-      motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
+      motors_control((inv)*PS4.LStickY(), (1.5)*PS4.RStickX());
+
     }
 
   //Sentido de locomocao invertido
