@@ -3,7 +3,7 @@
 //Biblioteca para controle de servo p/ brushless
 #include <ESP32Servo.h>
 
-char ipControle[18] = "9F:56:45:F8:96:18"; //MAC address atrubuído ao controle
+char ipControle[18] = "9F:56:45:F8:96:13"; //MAC address atrubuído ao controle
 int analogicoMargemDeErro = 30; //definiçao do ponto morto
 
 //Pinos das ESCs
@@ -73,10 +73,10 @@ void loop() {
   // Multiplicadcor = 1.8 para aumentar a velocidade linear, o quao rapido o robo vai ser
   // Multiplicadcor2 = multiplic_curva, parametro que varia de 1 ate a 2.3 para suavisar as curvas em alta velocidade
     if(PS4.LStickY()<-analogicoMargemDeErro || PS4.LStickY()>analogicoMargemDeErro){
-      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX()/(1.2));
+      motors_control((1.9)*inv*PS4.LStickY(), PS4.RStickX());
 
     }else { // Controle sobre valores pequenos devido a problemas na funcao map
-      motors_control((1.8)*inv*PS4.LStickY(), (1.2)*PS4.RStickX());
+      motors_control((1.6)*inv*PS4.LStickY(), (1.4)*PS4.RStickX());
     }
 
   //Sentido de locomocao invertido
